@@ -8,13 +8,13 @@
     "box_version_description": "functional-zone management + automated Atlas uploads",
     "vmware_boot_wait": "60s",
     "virtualbox_boot_wait": "60s",
-    "vmx_source_path": "./images/vmx",
+    "vmx_source_path": "images/vmx",
     "ova_source_path": "./images/fixedova",
     "output_path": "./builds",
     "vagrant_insecure_public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key",
     "vagrant_user":  "vagrant",
-    "vmware_nic1_network": "hostonly",
-    "vmware_nic2_network": "hostonly",
+    "vmware_nic1_network": "vmnet1",
+    "vmware_nic2_network": "vmnet2",
     "vmware_nic3_network": "hostonly",
     "vmware_nic4_network": "hostonly",
     "vmware_nic5_network": "hostonly",
@@ -44,7 +44,7 @@
         "set system host-name vsrx<enter><wait>",
         "set system services netconf ssh<enter><wait>",
         "set system root-authentication plain-text-password<enter><wait>",
-        "Juniper<enter>Juniper<enter><wait>",
+        "admin123<enter>admin123<enter><wait>",
         "set system root-authentication ssh-rsa \"{{user `vagrant_insecure_public_key`}}\"<enter><wait10>",
         "set system services ssh root-login allow<enter><wait>",
         "set system login user {{user `vagrant_user`}} class super-user<enter><wait>",
@@ -56,9 +56,9 @@
         "commit and-quit<enter><wait10>",
         "exit<enter><wait>"
       ],
-      "source_path": "{{user `vmx_source_path`}}/{{user `junos_version`}}/junos-{{user `product`}}-{{user `junos_release`}}{{user `junos_version`}}-{{user `suffix`}}.vmx",
+      "source_path": "/home/bo/Desktop/3rd_semester/special_subjects/srx-packer/firefly-packer/images/vmx/X47-D15.4/junos-vsrx-12.1X47-D15.4-domestic.vmx",
       "ssh_username": "root",
-      "ssh_password": "Juniper",
+      "ssh_password": "admin123",
       "vnc_port_min": "5800",
       "vnc_port_max": "5900",
       "shutdown_command": "echo 'shutdown -p now' > shutdown.sh; chmod 755 shutdown.sh; sh shutdown.sh",
@@ -152,7 +152,7 @@
   "post-processors": [
     {
       "type": "vagrant",
-      "output": "{{user `output_path`}}/{{.Provider}}/junos-{{user `product`}}-{{user `junos_version`}}-{{.Provider}}.box",
+      "output": "/home/bo/Desktop/3rd_semester/special_subjects/srx-packer/firefly-packer/builds/vmware",
       "vagrantfile_template": "./tpl/X47-D15.4.tpl"
     }
   ],

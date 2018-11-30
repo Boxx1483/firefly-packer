@@ -1,0 +1,100 @@
+  {
+    "variables": {
+      "product": "vsrx",
+      "junos_release": "12.1",
+      "junos_version": "X47-D15.4",
+      "suffix": "domestic",
+      "box_version": "0.5.0",
+      "box_version_description": "functional-zone management + automated Atlas uploads",
+      "vmware_boot_wait": "60s",
+      "vagrant_insecure_public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key",
+      "vagrant_user":  "vagrant",
+      "vmware_nic1_network": "/dev/vmnet1",
+      "vmware_nic2_network": "vmnet2",
+      "vmware_nic3_network": "vmnet3",
+      "vmware_nic4_network": "hostonly",
+      "vmware_nic5_network": "hostonly",
+      "vmware_nic6_network": "hostonly",
+      "vmware_nic7_network": "hostonly",
+      "vmware_nic8_network": "hostonly",
+      "vmware_nic9_network": "hostonly"
+    },
+    "builders": [
+      {
+        "type": "vmware-vmx",
+        "boot_wait": "{{user `vmware_boot_wait`}}",
+        "boot_command": [
+          "root<enter><wait5>",
+          "chown -R root:wheel /cf/root<enter><wait10>",
+          "chown -R root:wheel /cf/etc<enter><wait10>",
+          "sysctl -w net.inet.ip.mcast_ttl=64<enter><wait5>",
+          "cli<enter><wait><wait>",
+          "conf<enter><wait>",
+          "set system host-name vsrx<enter><wait>",
+          "set system services netconf ssh<enter><wait>",
+          "set system root-authentication plain-text-password<enter><wait>",
+          "Juniper<enter>Juniper<enter><wait>",
+          "set system root-authentication ssh-rsa \"{{user `vagrant_insecure_public_key`}}\"<enter><wait10>",
+          "set system services ssh root-login allow<enter><wait>",
+          "set system login user {{user `vagrant_user`}} class super-user<enter><wait>",
+          "set system login user {{user `vagrant_user`}} authentication ssh-rsa \"{{user `vagrant_insecure_public_key`}}\"<enter><wait10>",
+          "set interfaces ge-0/0/0.0 family inet dhcp<enter><wait>",
+          "delete security<enter><wait5>",
+          "set security forwarding-options family mpls mode packet-based<enter><wait>",
+          "set security forwarding-options family inet6 mode packet-based<enter><wait>",
+          "commit and-quit<enter><wait10>",
+          "exit<enter><wait5>",
+          "reboot<enter><wait10><wait10><wait10><wait10><wait10><wait10>"
+        ],
+        "source_path": "/home/bo/vmware/junos-vsrx-12.1X47-D15.4-domestic/junos-vsrx-12.1X47-D15.4-domestic.vmx",
+        "ssh_username": "root",
+        "ssh_password": "Juniper",
+        "vnc_port_min": "5800",
+        "vnc_port_max": "5900",
+        "shutdown_command": "echo 'shutdown -p now' > shutdown.sh; chmod 755 shutdown.sh; sh shutdown.sh",
+        "vmx_data": {
+          "ethernet0.connectionType": "nat",
+          "ethernet1.present": "true",
+          "ethernet1.startConnected": "true",
+          "ethernet1.connectionType": "{{user `vmware_nic1_network`}}",
+          "ethernet2.present": "true",
+          "ethernet2.connectionType": "{{user `vmware_nic2_network`}}",
+          "ethernet3.present": "true",
+          "ethernet3.connectionType": "{{user `vmware_nic3_network`}}",
+          "ethernet4.present": "true",
+          "ethernet4.connectionType": "{{user `vmware_nic4_network`}}",
+          "ethernet5.present": "true",
+          "ethernet5.connectionType": "{{user `vmware_nic5_network`}}",
+          "ethernet6.present": "true",
+          "ethernet6.connectionType": "{{user `vmware_nic6_network`}}",
+          "ethernet7.present": "true",
+          "ethernet7.connectionType": "{{user `vmware_nic7_network`}}",
+          "ethernet8.present": "true",
+          "ethernet8.connectionType": "{{user `vmware_nic8_network`}}",
+          "ethernet9.present": "true",
+          "ethernet9.connectionType": "{{user `vmware_nic9_network`}}"
+        }
+      }
+    ],
+    "provisioners": [
+      {
+        "type": "file",
+        "source": "scripts/junos/rc.custom",
+        "destination": "/cf/etc/rc.custom"
+      },
+      {
+        "type": "file",
+        "source": "scripts/junos/loader.conf",
+        "destination": "/cf/boot/loader.conf"
+      },
+      {
+        "type": "shell",
+  
+        "execute_command": "sh {{.Path}}",
+        "inline": [
+          "chmod 0755 /cf/etc/rc.custom",
+          "ls -la /cf/etc/rc.custom"
+        ]
+      }
+    ]
+  }
